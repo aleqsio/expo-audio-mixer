@@ -20,6 +20,14 @@ export function setPan(value: number): string {
   return ExpoAudioMixerModule.setPan(value);
 }
 
+export function stop() {
+  ExpoAudioMixerModule.stop();
+}
+
+export function pause() {
+  ExpoAudioMixerModule.pause();
+}
+
 // export async function setValueAsync(value: string) {
 //   return await ExpoAudioMixerModule.setValueAsync(value);
 // }

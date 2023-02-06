@@ -39,14 +39,15 @@ export default function App() {
       </Text>
       <Button onPress={download} title="download"></Button>
       <Button
-        onPress={() => ExpoAudioMixer.play("M1F1.wav", "M1F2.wav")}
+        onPress={() => ExpoAudioMixer.play(uri, uri2)}
         title="Play me"
       ></Button>
+      <Button onPress={() => ExpoAudioMixer.stop()} title="Stop me"></Button>
       <Slider
         style={{ width: 200 }}
         minimumValue={0}
         maximumValue={1}
-        onValueChange={(value) => ExpoAudioMixer.setPan(value)}
+        onSlidingComplete={(value) => ExpoAudioMixer.setPan(value)}
       />
     </View>
   );

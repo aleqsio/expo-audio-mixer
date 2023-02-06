@@ -1,47 +1,90 @@
 package expo.modules.audiomixer
 
+import android.net.Uri
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
 class ExpoAudioMixerModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  var lastPan = 0.5f
+
+  var firstTrackPlayerIsReady = false
+  val firstTrackPlayer: ExoPlayer by lazy {
+    ExoPlayer
+      .Builder(appContext.reactContext!!)
+      .build()
+      .apply {
+        addListener(object : Player.Listener {
+          override fun onPlaybackStateChanged(playbackState: Int) {
+            firstTrackPlayerIsReady = playbackState == Player.STATE_READY
+
+            if (firstTrackPlayerIsReady && secondTrackPlayerIsReady) {
+              this@apply.play()
+              secondTrackPlayer.play()
+            }
+          }
+        })
+      }
+  }
+
+  var secondTrackPlayerIsReady = false
+  val secondTrackPlayer: ExoPlayer by lazy {
+    ExoPlayer
+      .Builder(appContext.reactContext!!)
+      .build()
+      .apply {
+        addListener(object : Player.Listener {
+          override fun onPlaybackStateChanged(playbackState: Int) {
+            secondTrackPlayerIsReady = playbackState == Player.STATE_READY
+
+            if (firstTrackPlayerIsReady && secondTrackPlayerIsReady) {
+              this@apply.play()
+              firstTrackPlayer.play()
+            }
+          }
+        })
+      }
+  }
+
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoAudioMixer')` in JavaScript.
     Name("ExpoAudioMixer")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
+    Function("play") { file1: Uri, file2: Uri ->
+      firstTrackPlayer.setMediaSource(ProgressiveMediaSource.Factory(
+        DefaultDataSource.Factory(appContext.reactContext!!)
+      ).createMediaSource(MediaItem.fromUri(file1)))
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+      firstTrackPlayer.prepare()
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+      secondTrackPlayer.setMediaSource(ProgressiveMediaSource.Factory(
+        DefaultDataSource.Factory(appContext.reactContext!!)
+      ).createMediaSource(MediaItem.fromUri(file2)))
+
+      secondTrackPlayer.prepare()
+
+      firstTrackPlayer.volume = lastPan
+      secondTrackPlayer.volume = 1f - lastPan
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
+    Function("pause") {
+      firstTrackPlayer.pause()
+      secondTrackPlayer.pause()
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(ExpoAudioMixerView::class) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { view: ExpoAudioMixerView, prop: String ->
-        println(prop)
-      }
+    Function("stop") {
+      firstTrackPlayer.stop()
+      secondTrackPlayer.stop()
+    }
+
+    Function("setPan") { pan: Float ->
+      firstTrackPlayer.volume = pan
+      secondTrackPlayer.volume = 1f - pan
+
+      lastPan = pan
     }
   }
 }
