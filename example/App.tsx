@@ -3,7 +3,7 @@ import { Button, Slider, StyleSheet, Text, View } from "react-native";
 import * as ExpoAudioMixer from "expo-audio-mixer";
 import * as FileSystem from "expo-file-system";
 import { useState } from "react";
-
+// https://github.com/welbesw/CoreAudioMixer/blob/master/CoreAudioMixer/CoreAudioInterface/AudioEngineManager.m
 export default function App() {
   const [uri, setUri] = useState<string>();
   const [uri2, setUri2] = useState<string>();
@@ -49,6 +49,10 @@ export default function App() {
         maximumValue={1}
         onSlidingComplete={(value) => ExpoAudioMixer.setPan(value)}
       />
+      <Button
+        onPress={() => ExpoAudioMixer.setPan(0.5)}
+        title="Center me"
+      ></Button>
     </View>
   );
 }

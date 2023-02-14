@@ -10,7 +10,9 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
 class ExpoAudioMixerModule : Module() {
-  var lastPan = 0.5f
+  // var lastFirstTrackVolume = 0.5f
+  // var lastSecondTrackVolume = 0.5f
+
 
   var firstTrackPlayerIsReady = false
   val firstTrackPlayer: ExoPlayer by lazy {
@@ -66,8 +68,8 @@ class ExpoAudioMixerModule : Module() {
 
       secondTrackPlayer.prepare()
 
-      firstTrackPlayer.volume = lastPan
-      secondTrackPlayer.volume = 1f - lastPan
+      // firstTrackPlayer.volume = lastFirstTrackVolume
+      // secondTrackPlayer.volume = lastSecondTrackVolume
     }
 
     Function("pause") {
@@ -75,16 +77,26 @@ class ExpoAudioMixerModule : Module() {
       secondTrackPlayer.pause()
     }
 
+    Function("resume") {
+      firstTrackPlayer.resume()
+      secondTrackPlayer.resume()
+    }
+
     Function("stop") {
       firstTrackPlayer.stop()
       secondTrackPlayer.stop()
     }
 
-    Function("setPan") { pan: Float ->
-      firstTrackPlayer.volume = pan
-      secondTrackPlayer.volume = 1f - pan
+    Function("setVolume") { firstTrackVolume: Float, secondTrackVolume: Float ->
+      firstTrackPlayer.volume = firstTrackVolume
+      // lastFirstTrackVolume = firstTrackVolume
+      secondTrackPlayer.volume = secondTrackVolume
+      // lastSecondTrackVolume = secondTrackVolume
+    }
 
-      lastPan = pan
+    Function("setPan") { firstTrackPan: Float, secondTrackPan: Float ->
+      firstTrackPlayer.pan = firstTrackPan
+      secondTrackPlayer.pan = secondTrackPan
     }
   }
 }
