@@ -47,10 +47,12 @@ export default function App() {
         style={{ width: 200 }}
         minimumValue={0}
         maximumValue={1}
-        onSlidingComplete={(value) => ExpoAudioMixer.setPan(value)}
+        onSlidingComplete={(value) =>
+          ExpoAudioMixer.setVolume(value, 1 - value)
+        }
       />
       <Button
-        onPress={() => ExpoAudioMixer.setPan(0.5)}
+        onPress={() => ExpoAudioMixer.setVolume(0.5, 0.5)}
         title="Center me"
       ></Button>
     </View>
