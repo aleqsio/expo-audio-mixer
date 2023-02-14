@@ -88,4 +88,7 @@ repositories {
 dependencies {
   implementation project(':expo-modules-core')
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${getKotlinVersion()}"
+
+  implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
+  implementation 'com.google.android.exoplayer:extension-okhttp:2.18.1'
 }
